@@ -1,0 +1,29 @@
+.pg_form{
+    width:500px;
+    margin:100px auto;
+}
+.pg_form input[type="submit"]{
+    border:0;
+    width:60px;
+    height:25px;
+    cursor:pointer;
+    font-size:13px;
+}
+.pg_form input[type="submit"]:hover{
+   color:#f00;
+}
+.pg_form a{
+    text-decoration: none;
+    color:#000;
+    font-weight: bold;
+}
+.pg_form a:hover{
+    color:#F00;
+}
+.pg_form span{
+    font-size: 13px;
+}
+input[name="email"]{
+    font-size: 15px;
+    height:20px;
+}
