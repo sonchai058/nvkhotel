@@ -30,12 +30,12 @@
 <link rel="stylesheet" media="all and (min-width:1101px)" rel="stylesheet" href="<?php echo base_url('assets/css/large_style.css')?>">
 
 <?php
-	if(uri_seg(2)=='package_info' && uri_seg(3)==''){?>
-		<link rel="stylesheet" type="text/css" href="<?=base_url('assets/js/datatable/css/jquery.dataTables.css');?>">
-		<script type="text/javascript" language="javascript" src="<?=base_url('assets/js/datatable/js/jquery.js');?>"></script>
-		<script type="text/javascript" language="javascript" src="<?=base_url('assets/js/datatable/js/jquery.dataTables.js');?>"></script>
-		<script type="text/javascript" language="javascript" src="<?=base_url('assets/js/datatable/extensions/TableTools/js/dataTables.tableTools.js');?>"></script>
-		<link rel="stylesheet" type="text/css" href="<?=base_url('assets/js/datatable/extensions/TableTools/css/dataTables.tableTools.css');?>">
+	if((uri_seg(2)=='package_info' && uri_seg(3)=='')||(uri_seg(2)=='account_info' && uri_seg(3)=='')){?>
+		<link rel="stylesheet" type="text/css" href="<?=base_url('assets/plugin/datatable/css/jquery.dataTables.css');?>">
+		<script type="text/javascript" language="javascript" src="<?=base_url('assets/plugin/datatable/js/jquery.js');?>"></script>
+		<script type="text/javascript" language="javascript" src="<?=base_url('assets/plugin/datatable/js/jquery.dataTables.js');?>"></script>
+		<script type="text/javascript" language="javascript" src="<?=base_url('assets/plugin/datatable/extensions/TableTools/js/dataTables.tableTools.js');?>"></script>
+		<link rel="stylesheet" type="text/css" href="<?=base_url('assets/plugin/datatable/extensions/TableTools/css/dataTables.tableTools.css');?>">
 <?php	
 	}
 ?>

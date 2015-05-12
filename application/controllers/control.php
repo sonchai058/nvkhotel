@@ -18,7 +18,7 @@ class Control extends CI_Controller {
 	{
 		$this->admin_model->AccessLevel(array('0'));
 		if(get_inpost('bt_submit')==''){
-			$data['title']="Website_setting";
+			$data['title']="Website Setting";
 			$data['site']=rowArray($this->common_model->getTable('sip_webdetail'));
 			$data['content_view']="content/webset";
 			$this->load->view('index_page',$data);		
@@ -238,7 +238,7 @@ class Control extends CI_Controller {
 	{
 		$this->admin_model->AccessLevel(array('0'));
 		if(uri_seg(3)==''){
-			$data['title']='package Info';
+			$data['title']='Package Info';
 			$data['packages']=$this->package_model->getAllpackage();
 			$data['content_view']="content/package";
 			$this->load->view('index_page',$data);
@@ -249,7 +249,7 @@ class Control extends CI_Controller {
 					'amount'=>'',
 					'status'=>'1',
 			);
-			$data['title']='Add package Info';
+			$data['title']='Add Package Info';
 			$data['package']=$data;
 			$data['content_view']="content/package";
 			$this->load->view('index_page',$data);	
@@ -297,13 +297,13 @@ class Control extends CI_Controller {
 						'status'=>trim(set_value('status')),
 					);
 					
-					$data['title']='package Info';
+					$data['title']='Error! Add Package Info';
 					$data['package']=$data;
 					$data['content_view']="content/package";
 					$this->load->view('index_page',$data);	
 			}
 		}else if(uri_seg(3)=='edit' && get_inpost('bt_submit')==''){
-			$data['title']='Edit package Info';
+			$data['title']='Edit Package Info';
 			$data['package']=$this->package_model->getOncepackage(uri_seg(3));
 			if(count($data['package'])<1)
 				redirect('control/package_info','refresh');
@@ -355,7 +355,7 @@ class Control extends CI_Controller {
 						'status'=>trim(set_value('status')),						
 					);
 					
-					$data['title']='Edit Fail! package Info';
+					$data['title']='Error! Edit Package Info';
 					$data['package']=$data;
 					$data['content_view']="content/package";
 					$this->load->view('index_page',$data);
@@ -370,132 +370,310 @@ class Control extends CI_Controller {
 	{
 		$this->admin_model->AccessLevel(array('0'));
 		if(uri_seg(3)==''){
-			$data['title']='account Info';
-			$data['packages']=$this->account_model->getAllaccount();
+			$data['title']='Account Info';
+			$data['accounts']=$this->account_model->getAllaccount();
 			$data['content_view']="content/account";
 			$this->load->view('index_page',$data);
 		}else if(uri_seg(3)=='add' && get_inpost('bt_submit')==''){
 			$data=array(
+					'ref'=>'',
 					'name'=>'',
-					'detail'=>'',
-					'amount'=>'',
+					'address'=>'',
+					'tel'=>'',
+					'web'=>'',
+					'callcenter'=>'',
+					'latitude'=>'',
+					'longitude'=>'',
+					'package'=>'',
+					'sipserver'=>'',
+					'user'=>'',
+					'password'=>'',
+					'email'=>'',
 					'status'=>'1',
+					'isactive'=>'1',		
 			);
-			$data['title']='Add package Info';
-			$data['package']=$data;
-			$data['content_view']="content/package";
+			$data['title']='Add Account Info';
+			$data['account']=$data;
+			$data['content_view']="content/account";
 			$this->load->view('index_page',$data);	
 		}else if(uri_seg(3)=='add' && get_inpost('bt_submit')!=''){
 			$this->load->library('form_validation');
 			$frm=$this->form_validation;
+			
 			$arr=array(
+					array('field'=>'ref',
+						  'label'=>'Ref',
+						  'rules'=>'trim',
+					),
 					array('field'=>'name',
-						  'label'=>'package Name',
+						  'label'=>'Account Name',
 						  'rules'=>'required',
 					),
-					array('field'=>'detail',
-						  'label'=>'Detail',
+					array('field'=>'address',
+						  'label'=>'Address',
 						  'rules'=>'trim',
 					),				   
-					array('field'=>'amount',
-						  'label'=>'Amount',
-						  'rules'=>'numeric',
+					array('field'=>'tel',
+						  'label'=>'Tel',
+						  'rules'=>'trim',
+					),
+					array('field'=>'web',
+						  'label'=>'Web',
+						  'rules'=>'trim',
+					),
+					array('field'=>'callcenter',
+						  'label'=>'Callcenter',
+						  'rules'=>'trim',
+					),
+					array('field'=>'latitude',
+						  'label'=>'Latitude',
+						  'rules'=>'trim',
+					),
+					array('field'=>'longitude',
+						  'label'=>'Longitude',
+						  'rules'=>'trim',
+					),
+					array('field'=>'package',
+						  'label'=>'Package',
+						  'rules'=>'required',
+					),
+					array('field'=>'sipserver',
+						  'label'=>'Sipserver',
+						  'rules'=>'required',
+					),
+					array('field'=>'user',
+						  'label'=>'Username',
+						  'rules'=>'required|callback_check_duplicate_user',
+					),
+					array('field'=>'password',
+						  'label'=>'Password',
+						  'rules'=>'required',
+					),
+					array('field'=>'email',
+						  'label'=>'Email',
+						  'rules'=>'required|valid_email',
 					),
 					array('field'=>'status',
 						  'label'=>'Status',
 						  'rules'=>'required',
+					),	
+					array('field'=>'isactive',
+						  'label'=>'Isactive',
+						  'rules'=>'required',
 					),		
 			);
 			$frm->set_rules($arr);
-			
 			$frm->set_message("required","กรุณากรอกข้อมูล %s");
 			$frm->set_message("numeric","%s กรุณาป้อนข้อมูลที่เป็นเลข");
+			$frm->set_message("check_duplicate_user","เกิดข้อผิดพลาด! Username นี้มีอยู่แล้ว");
+			$frm->set_message("valid_email","รูปแบบอีเมล์ต้องถูกต้อง");
 			
 			if($frm->run()){
+				$this->db->trans_strict(true);
+				$this->db->trans_begin();
+		
 					$data=array(
+						'ref'=>trim(get_inpost('ref')),
 						'name'=>trim(get_inpost('name')),
-						'detail'=>trim(get_inpost('detail')),
-						'user_add'=>get_session('user_id'),
-						'amount'=>trim(get_inpost('amount')),
+						'address'=>trim(get_inpost('address')),
+						'tel'=>trim(get_inpost('tel')),
+						'web'=>trim(get_inpost('web')),
+						'callcenter'=>trim(get_inpost('callcenter')),
+						'latitude'=>trim(get_inpost('latitude')),
+						'longitude'=>trim(get_inpost('longitude')),
+						'package'=>trim(get_inpost('package')),
+						'sipserver'=>trim(get_inpost('sipserver')),
+						'email'=>trim(get_inpost('email')),
 						'status'=>trim(get_inpost('status')),
+						'isactive'=>trim(get_inpost('isactive')),
+						'user_add'=>get_session('user_id'),
 					);
-					$this->common_model->insert('sip_packages',$data);
-					redirect('control/package_info','refresh');					
+					$id=$this->common_model->insert('sip_accounts',$data);
+			
+					$data=array(
+						'user'=>trim(get_inpost('user')),
+						'password'=>trim(get_inpost('password')),
+						'account'=>$id,
+					);
+					$this->common_model->insert('sip_login',$data);		
+					
+					$data=array();	
+					$maxid=$this->account_model->getMaxidAccount();
+					$temp=$this->package_model->getOncePackage(trim(get_inpost('package')));
+					$amount=(int)$temp['amount'];
+					for($i=0;$i<$amount;$i++){
+						$sipname=(333*10000)+$id+1+$i+$maxid;
+						$data[]=array(
+							'account'=>$id,
+							'sipname'=>$sipname,
+							'password'=>"SIP".trim(get_inpost('user')).$sipname,
+							'isactive'=>'0',				
+						);	
+					}
+					$this->common_model->insert_batch('sip_users',$data);
+					
+				if($this->db->trans_status() === FALSE)
+				{
+					$this->db->trans_rollback();
+					return false;
+					dieFont('data processing error!');
+				}else{
+					$this->db->trans_commit();
+					redirect('control/account_info','refresh');	
+				}	
+								
 			}else{
 					$data=array(
+						'ref'=>trim(set_value('ref')),
 						'name'=>trim(set_value('name')),
-						'detail'=>trim(set_value('detail')),
-						'amount'=>trim(set_value('amount')),
+						'address'=>trim(set_value('address')),
+						'tel'=>trim(set_value('tel')),
+						'web'=>trim(set_value('web')),
+						'callcenter'=>trim(set_value('callcenter')),
+						'latitude'=>trim(set_value('latitude')),
+						'longitude'=>trim(set_value('longitude')),
+						'package'=>trim(set_value('package')),
+						'sipserver'=>trim(set_value('sipserver')),
+						'email'=>trim(set_value('email')),
 						'status'=>trim(set_value('status')),
-					);
-					
-					$data['title']='package Info';
-					$data['package']=$data;
-					$data['content_view']="content/package";
+						'isactive'=>trim(set_value('isactive')),
+						'user'=>trim(set_value('user')),
+						'password'=>trim(set_value('password')),
+						'email'=>trim(set_value('email')),
+					);				
+					$data['title']='Error! Add Account Info';
+					$data['account']=$data;
+					$data['content_view']="content/account";
 					$this->load->view('index_page',$data);	
 			}
 		}else if(uri_seg(3)=='edit' && get_inpost('bt_submit')==''){
-			$data['title']='Edit package Info';
-			$data['package']=$this->package_model->getOncepackage(uri_seg(4));
-			if(count($data['package'])<1)
-				redirect('control/package_info','refresh');
+			$data['title']='Edit Account Info';
+			$data['account']=$this->account_model->getOnceaccount(uri_seg(4));
+			
+			if(count($data['account'])<1)
+				redirect('control/account_info','refresh');
 				
-			$data['content_view']="content/package";
+			$data['content_view']="content/account";
 			$this->load->view('index_page',$data);	
 		}else if(uri_seg(3)=='edit' && get_inpost('bt_submit')!=''){
-			
 			$this->load->library('form_validation');
 			$frm=$this->form_validation;
 			$arr=array(
+					array('field'=>'ref',
+						  'label'=>'Ref',
+						  'rules'=>'trim',
+					),
 					array('field'=>'name',
-						  'label'=>'package Name',
+						  'label'=>'Account Name',
 						  'rules'=>'required',
 					),
-					array('field'=>'detail',
-						  'label'=>'Detail',
+					array('field'=>'address',
+						  'label'=>'Address',
 						  'rules'=>'trim',
 					),				   
-					array('field'=>'amount',
-						  'label'=>'Amount',
-						  'rules'=>'numeric',
+					array('field'=>'tel',
+						  'label'=>'Tel',
+						  'rules'=>'trim',
+					),
+					array('field'=>'web',
+						  'label'=>'Web',
+						  'rules'=>'trim',
+					),
+					array('field'=>'callcenter',
+						  'label'=>'Callcenter',
+						  'rules'=>'trim',
+					),
+					array('field'=>'latitude',
+						  'label'=>'Latitude',
+						  'rules'=>'trim',
+					),
+					array('field'=>'longitude',
+						  'label'=>'Longitude',
+						  'rules'=>'trim',
+					),
+					array('field'=>'sipserver',
+						  'label'=>'Sipserver',
+						  'rules'=>'required',
+					),
+					array('field'=>'password',
+						  'label'=>'Password',
+						  'rules'=>'required',
+					),
+					array('field'=>'email',
+						  'label'=>'Email',
+						  'rules'=>'required|valid_email',
 					),
 					array('field'=>'status',
 						  'label'=>'Status',
 						  'rules'=>'required',
+					),	
+					array('field'=>'isactive',
+						  'label'=>'Isactive',
+						  'rules'=>'required',
 					),		
 			);
 			$frm->set_rules($arr);
-			
 			$frm->set_message("required","กรุณากรอกข้อมูล %s");
 			$frm->set_message("numeric","%s กรุณาป้อนข้อมูลที่เป็นเลข");
+			$frm->set_message("check_duplicate_user","เกิดข้อผิดพลาด! Username นี้มีอยู่แล้ว");
+			$frm->set_message("valid_email","รูปแบบอีเมล์ต้องถูกต้อง");
 			
 			if($frm->run()){
 					$data=array(
+						'ref'=>trim(get_inpost('ref')),
 						'name'=>trim(get_inpost('name')),
-						'detail'=>trim(get_inpost('detail')),
-						'user_add'=>get_session('user_id'),
-						'amount'=>trim(get_inpost('amount')),
+						'address'=>trim(get_inpost('address')),
+						'tel'=>trim(get_inpost('tel')),
+						'web'=>trim(get_inpost('web')),
+						'callcenter'=>trim(get_inpost('callcenter')),
+						'latitude'=>trim(get_inpost('latitude')),
+						'longitude'=>trim(get_inpost('longitude')),
+						'sipserver'=>trim(get_inpost('sipserver')),
+						'email'=>trim(get_inpost('email')),
 						'status'=>trim(get_inpost('status')),
+						'isactive'=>trim(get_inpost('isactive')),
 					);
-					$this->common_model->update('sip_packages',$data,array("id"=>uri_seg(4)));
-					redirect('control/package_info','refresh');					
+					$this->common_model->update('sip_accounts',$data,array("id"=>uri_seg(4)));
+					
+					$data=array(
+						'password'=>trim(get_inpost('password')),
+					);
+					$this->common_model->update('sip_login',$data,array("id"=>uri_seg(4)));	
+						
+					redirect('control/account_info','refresh');					
 			}else{
 					$data=array(
+						'ref'=>trim(set_value('ref')),
 						'name'=>trim(set_value('name')),
-						'detail'=>trim(set_value('detail')),
-						'amount'=>trim(set_value('amount')),
-						'status'=>trim(set_value('status')),						
-					);
+						'address'=>trim(set_value('address')),
+						'tel'=>trim(set_value('tel')),
+						'web'=>trim(set_value('web')),
+						'callcenter'=>trim(set_value('callcenter')),
+						'latitude'=>trim(set_value('latitude')),
+						'longitude'=>trim(set_value('longitude')),
+						'sipserver'=>trim(set_value('sipserver')),
+						'status'=>trim(set_value('status')),
+						'isactive'=>trim(set_value('isactive')),
+						'password'=>trim(set_value('password')),
+						'email'=>trim(set_value('email')),
+					);	
 					
-					$data['title']='Edit Fail! package Info';
-					$data['package']=$data;
-					$data['content_view']="content/package";
+					$data['title']='Edit Fail! Account Info';
+					$data['account']=$data;
+					$data['content_view']="content/account";
 					$this->load->view('index_page',$data);
 			}
 		}else if(uri_seg(3)=='del' && uri_seg(4)!=''){
-			$this->common_model->update('sip_packages',array('status'=>'3'),array('id'=>uri_seg(4)));
-			redirect('control/package_info','refresh');
+			$this->common_model->update('sip_accounts',array('status'=>'3'),array('id'=>uri_seg(4)));
+			redirect('control/account_info','refresh');
 		}
+	}
+	public function check_duplicate_user($user){
+		$temp=rowArray($this->common_model->get_where_custom_field("sip_login",'user',$user,'user'));
+		if(isset($temp['user']))
+			return false;
+		else
+			return true;
 	}
 
 }

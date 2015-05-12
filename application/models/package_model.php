@@ -9,7 +9,7 @@ class package_model extends CI_Model {
         return $this->common_model->custom_query("select * from sip_packages where status = 1");
     }
     public function getOncePackage($id=''){
-        if(uri_seg(4)=='')
+        if($id=='')
             return false;
         else{
             return rowArray($this->common_model->get_where_custom('sip_packages','id',$id));

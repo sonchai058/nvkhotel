@@ -205,6 +205,9 @@ img{
 		height:26px;
 		font-size:14px;
 	}
+  .dataTables_length label,.dataTables_wrapper label{
+    color:#fff;
+  }
 	.table_result{
 		width: 95%;
 		margin: 10px auto 10px auto;
@@ -232,7 +235,7 @@ img{
 
 	.table_result table th{
 		font-weight:bold;
-		color: #163f9a;
+		color: #FF9900;
 		height: 42px;
     background-color: rgba(227,227,227,0.4);
 		border: 1px solid #ccc;

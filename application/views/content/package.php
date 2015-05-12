@@ -60,12 +60,12 @@
 	echo '<div class="form_message_error">'.validation_errors()."</div>";	
 	?>
 	<table width="100%" cellspacing="10px">
-		<tr><td align="right" class="label">package Name &nbsp;&nbsp;</td><td align="left" align="right">&nbsp;&nbsp;<input type="text" class="form_text" title="package Name"  name="name" value="<?php echo $package['name'];?>" required></td></tr>
+		<tr><td align="right" class="label">Package Name <font color="red">*</font>&nbsp;&nbsp;</td><td align="left" align="right">&nbsp;&nbsp;<input type="text" class="form_text" title="package Name"  name="name" value="<?php echo $package['name'];?>" required></td></tr>
 		<tr><td align="right" class="label">Detail &nbsp;&nbsp;</td><td align="left" align="right">&nbsp;&nbsp;<textarea rows="3" cols="32" class="form_text" title="Detail" name="detail"><?php echo $package['detail'];?></textarea></td></tr>
-		<tr><td align="right" class="label">Amount &nbsp;&nbsp;</td><td align="left" align="right">&nbsp;&nbsp;<input type="text" class="form_text" title="Amount"  name="amount" value="<?php echo $package['amount'];?>"></td></tr>
-		<tr><td align="right" class="label">Status &nbsp;&nbsp;</td>
+		<tr><td align="right" class="label">Amount <font color="red">*</font>&nbsp;&nbsp;</td><td align="left" align="right">&nbsp;&nbsp;<input type="number" class="form_text" title="Amount"  name="amount" value="<?php echo $package['amount'];?>" required></td></tr>
+		<tr><td align="right" class="label">Status <font color="red">*</font>&nbsp;&nbsp;</td>
 			<td align="left" align="right">&nbsp;&nbsp;
-				<select name="status" title="status">
+				<select name="status" title="status" required>
 				<?php
 					$rows=$this->package_model->getAllStatus();				
 					foreach($rows as $row){?>
